@@ -15,7 +15,9 @@ class RadialBasisFunctionRegression:
 	def basis(x, mu, sigma=1):
 		return math.exp(-(x-mu)**2/sigma**2)
 
-	def train(self, x, y):
+	def train(self, train_data):
+		x = train_data.x
+		y = train_data.y
 		N = len(x)
 		self.design_matrix = np.empty((N, self.num_basis))
 		for i in range(N):
@@ -24,32 +26,46 @@ class RadialBasisFunctionRegression:
 
 		self.weights = np.linalg.inv(self.design_matrix.transpose() @ self.design_matrix) @ self.design_matrix.transpose() @ y
 
-	def plot_predict_curve(self, train_data=None):
+	def predict(self):
 		x = np.linspace(-7, 5, 100)
-		pre_y = np.zeros(len(x))
+		self.pre_y = np.zeros(len(x))
 		for i in range(len(x)):
 			for j in range(self.num_basis):
-				pre_y[i] += self.weights[j] * self.basis(x[i], self.mus[j])
-	
-		if train_data != None:
-			plt.scatter(train_data.x, train_data.y, label="input data")
-			plt.legend()
+				self.pre_y[i] += self.weights[j] * self.basis(x[i], self.mus[j])
 
-		plt.xlabel("x", fontsize=16)
-		plt.ylabel("y", fontsize=16)
-		plt.xlim(-7,5)
-		plt.ylim(-0.5,3.5)
-		plt.title("Predicted line by RBFR", fontsize="16")
-		plt.plot(x, pre_y, color="tomato")
-		plt.show()
+def plot_predict_curve(pre_y, no_noise_data=None, train_data=None):
+	x = np.linspace(-7, 5, 100)
+
+	plt.figure(figsize=(15, 10))	
+	if train_data != None:
+		plt.scatter(train_data.x, train_data.y, label="input data with noise")
+	if no_noise_data != None:
+		plt.plot(no_noise_data.x, no_noise_data.y, label="GT without noise", color="black", linestyle='dashed')
+
+	plt.xlabel("x", fontsize=16)
+	plt.ylabel("y", fontsize=16)
+	plt.xlim(-7,5)
+	plt.ylim(-0.5,3.5)
+	plt.tick_params(labelsize=16)
+	plt.title("Predicted line by RBFR", fontsize="16")
+	plt.plot(x, pre_y, label="predicted line", color="tomato")
+	plt.legend(fontsize=16)
+	plt.savefig("rbfr.png")
+	plt.show()
 
 def main():
-	train_data = dataset.DataSet(-7, 5, num_data=20, noise_level=0.2)
+	xmin = -7
+	xmax = +5
+	noise_level = 0.1
+
+	train_data = dataset.DataSet(xmin, xmax, num_data=20, noise_level=noise_level)
+	no_noise_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=0.0)
 	#train_data.plot()
 
 	model = RadialBasisFunctionRegression(num_basis=10)
-	model.train(train_data.x, train_data.y)
-	model.plot_predict_curve(train_data)
+	model.train(train_data)
+	model.predict()
+	plot_predict_curve(model.pre_y, no_noise_data, train_data)
 
 if __name__ == '__main__':
 	main()
