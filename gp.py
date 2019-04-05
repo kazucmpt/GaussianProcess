@@ -11,10 +11,7 @@ class GaussianProcess:
 		self.theta3 = theta3
 
 	def rbf(self, p, q):
-		if p == q :
-			return self.theta1 * math.exp(- (p-q)**2 / self.theta2) + self.theta3
-		else:
-			return self.theta1 * math.exp(- (p-q)**2 / self.theta2)
+		return self.theta1 * math.exp(- (p-q)**2 / self.theta2)
 
 	def train(self, train_data):
 		self.xtrain = train_data.x
@@ -24,7 +21,7 @@ class GaussianProcess:
 		self.kernel = np.empty((N, N))
 		for n1 in range(N):
 			for n2 in range(N):
-				self.kernel[n1, n2] = self.rbf(self.xtrain[n1], self.xtrain[n2])
+				self.kernel[n1, n2] = self.rbf(self.xtrain[n1], self.xtrain[n2]) + chr(n1, n2)*self.theta3
 
 	def test(self, test_data):
 		self.xtest  = test_data.x
@@ -46,18 +43,18 @@ class GaussianProcess:
 		self.mean = partial_kernel_train_test.T @ np.linalg.inv(self.kernel) @ self.ytrain
 		self.var  = partial_kernel_test_test - partial_kernel_train_test.T @ np.linalg.inv(self.kernel) @ partial_kernel_train_test
 
-	def plot_predict(self):	
+	def plot_predict(self, no_noise_data):	
 		var = np.diag(self.var)
-		self.xtest, mean, var = tiplet_shuffle(self.xtest, self.mean, var)
 
 		boundary_upper = np.empty(len(self.xtest))
 		boundary_lower = np.empty(len(self.xtest))
 		for i in range(len(self.xtest)):
-			boundary_upper[i] = mean[i] + var[i]
-			boundary_lower[i] = mean[i] - var[i]
+			boundary_upper[i] = self.mean[i] + var[i]
+			boundary_lower[i] = self.mean[i] - var[i]
 
 		plt.scatter(self.xtrain, self.ytrain, label="Train Data", color="red")
-		plt.plot(self.xtest, mean, label="Test Data")
+		plt.plot(self.xtest, self.mean, label="Predicted Line by limted test data")
+		plt.plot(no_noise_data.x, no_noise_data.y, label="GT without noise", color="black", linestyle='dashed')
 		plt.legend(fontsize=16)
 		plt.xlabel("x", fontsize=16)
 		plt.ylabel("y", fontsize=16)
@@ -67,22 +64,21 @@ class GaussianProcess:
 		plt.fill_between(self.xtest, boundary_upper, boundary_lower, facecolor='y',alpha=0.3)
 		plt.show()
 
-def tiplet_shuffle(p, q, r):
-	tmp = np.argsort(p)
-	q = q[tmp]
-	r = r[tmp]
-	p = np.sort(p)
-
-	return p, q, r
+def chr(a, b):
+	if a == b:
+		return 1
+	else:
+		return 0
 
 def main():
 	train_data = dataset.DataSet(-7, 5, num_data=50, noise_level=0.1)
-	test_data = dataset.DataSet(-7, 5, num_data=150, noise_level=0.1)
+	test_data = dataset.DataSet(-7, 5, num_data=1000, noise_level=0.1)
+	no_noise_data = dataset.DataSet(-7, 5, num_data=1000, noise_level=0.0)
 
 	model = GaussianProcess(theta1=1, theta2=0.4, theta3=0.1)
 	model.train(train_data)
 	model.test(test_data)
-	model.plot_predict()
+	model.plot_predict(no_noise_data)
 
 if __name__ == '__main__':
 	main()
