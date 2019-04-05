@@ -52,6 +52,7 @@ class GaussianProcess:
 			boundary_upper[i] = self.mean[i] + var[i]
 			boundary_lower[i] = self.mean[i] - var[i]
 
+		plt.figure(figsize=(15, 10))
 		plt.scatter(self.xtrain, self.ytrain, label="Train Data", color="red")
 		plt.plot(self.xtest, self.mean, label="Predicted Line by limted test data")
 		plt.plot(no_noise_data.x, no_noise_data.y, label="GT without noise", color="black", linestyle='dashed')
@@ -60,8 +61,10 @@ class GaussianProcess:
 		plt.ylabel("y", fontsize=16)
 		plt.xlim(-7,5)
 		plt.ylim(-0.5,3.5)
+		plt.tick_params(labelsize=16)
 		plt.title("Predicted line by Gaussian Process", fontsize="16")
 		plt.fill_between(self.xtest, boundary_upper, boundary_lower, facecolor='y',alpha=0.3)
+		plt.savefig("gp.png")
 		plt.show()
 
 def chr(a, b):
@@ -71,9 +74,13 @@ def chr(a, b):
 		return 0
 
 def main():
-	train_data = dataset.DataSet(-7, 5, num_data=50, noise_level=0.1)
-	test_data = dataset.DataSet(-7, 5, num_data=1000, noise_level=0.1)
-	no_noise_data = dataset.DataSet(-7, 5, num_data=1000, noise_level=0.0)
+	xmin = -7
+	xmax = 5
+	noise_level = 0.1
+
+	train_data = dataset.DataSet(xmin, xmax, num_data=50, noise_level=noise_level)
+	test_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=noise_level)
+	no_noise_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=0.0)
 
 	model = GaussianProcess(theta1=1, theta2=0.4, theta3=0.1)
 	model.train(train_data)
