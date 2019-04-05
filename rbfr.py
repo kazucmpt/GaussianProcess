@@ -33,7 +33,7 @@ class RadialBasisFunctionRegression:
 			for j in range(self.num_basis):
 				self.pre_y[i] += self.weights[j] * self.basis(x[i], self.mus[j])
 
-def plot_predict_curve(pre_y, no_noise_data=None, train_data=None):
+def draw(pre_y, no_noise_data=None, train_data=None):
 	x = np.linspace(-7, 5, 100)
 
 	plt.figure(figsize=(15, 10))	
@@ -65,7 +65,7 @@ def main():
 	model = RadialBasisFunctionRegression(num_basis=10)
 	model.train(train_data)
 	model.predict()
-	plot_predict_curve(model.pre_y, no_noise_data, train_data)
+	draw(model.pre_y, no_noise_data, train_data)
 
 if __name__ == '__main__':
 	main()
