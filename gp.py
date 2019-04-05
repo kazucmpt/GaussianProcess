@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import math
 import dataset
 
+xmin = -7
+xmax = 5
+noise_level = 0.1
+
 class GaussianProcess:
 
 	def __init__(self, theta1, theta2, theta3):
@@ -71,7 +75,7 @@ def draw(train_data, test_data, no_noise_data, mean_arr, var_arr):
 	plt.plot(no_noise_data.x, no_noise_data.y, label="GT without noise", color="black", linestyle='dashed')
 	plt.xlabel("x", fontsize=16)
 	plt.ylabel("y", fontsize=16)
-	plt.xlim(-7,5)
+	plt.xlim(xmin, xmax)
 	plt.ylim(-0.5,3.5)
 	plt.tick_params(labelsize=16)
 	plt.title("Predicted line by Gaussian Process", fontsize="16")
@@ -87,10 +91,6 @@ def chr(a, b):
 		return 0
 
 def main():
-	xmin = -7
-	xmax = 5
-	noise_level = 0.1
-
 	train_data = dataset.DataSet(xmin, xmax, num_data=50, noise_level=noise_level)
 	test_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=noise_level)
 	no_noise_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=0.0)
