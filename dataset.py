@@ -5,6 +5,8 @@ import math
 class DataSet:
 
 	def __init__(self, xmin, xmax, num_data, noise_level):
+		self.xmin = xmin
+		self.xmax = xmax
 		self.x = (xmax - xmin) * np.random.rand(num_data) + xmin
 		self.y = np.empty(num_data)
 
@@ -28,6 +30,11 @@ class DataSet:
 
 		return p, q
 
-	def plot(self):
+	def plot(self):	
+		plt.figure(figsize=(15, 10))
+		plt.xlabel("x", fontsize=16)
+		plt.ylabel("y", fontsize=16)
+		plt.xlim(self.xmin, self.xmax)
+		plt.tick_params(labelsize=16)
 		plt.scatter(self.x, self.y)
 		plt.show()
