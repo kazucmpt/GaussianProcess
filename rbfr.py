@@ -4,12 +4,16 @@ import math
 import dataset
 #Radial basis function regression
 
+xmin = -7
+xmax = +5
+noise_level = 0.1
+
 class RadialBasisFunctionRegression:
 
 	def __init__(self, num_basis):
 		self.num_basis = num_basis
 		self.weights = np.empty(self.num_basis)
-		self.mus = np.linspace(-7, 5, self.num_basis)
+		self.mus = np.linspace(xmin, xmax, self.num_basis)
 
 	@staticmethod
 	def basis(x, mu, sigma=1):
@@ -27,14 +31,14 @@ class RadialBasisFunctionRegression:
 		self.weights = np.linalg.inv(self.design_matrix.transpose() @ self.design_matrix) @ self.design_matrix.transpose() @ y
 
 	def predict(self):
-		x = np.linspace(-7, 5, 100)
+		x = np.linspace(xmin, xmax, 100)
 		self.pre_y = np.zeros(len(x))
 		for i in range(len(x)):
 			for j in range(self.num_basis):
 				self.pre_y[i] += self.weights[j] * self.basis(x[i], self.mus[j])
 
 def draw(pre_y, no_noise_data=None, train_data=None):
-	x = np.linspace(-7, 5, 100)
+	x = np.linspace(xmin, xmax, 100)
 
 	plt.figure(figsize=(15, 10))	
 	if train_data != None:
@@ -44,7 +48,7 @@ def draw(pre_y, no_noise_data=None, train_data=None):
 
 	plt.xlabel("x", fontsize=16)
 	plt.ylabel("y", fontsize=16)
-	plt.xlim(-7,5)
+	plt.xlim(xmin, xmax)
 	plt.ylim(-0.5,3.5)
 	plt.tick_params(labelsize=16)
 	plt.title("Predicted line by RBFR", fontsize="16")
@@ -54,13 +58,9 @@ def draw(pre_y, no_noise_data=None, train_data=None):
 	plt.show()
 
 def main():
-	xmin = -7
-	xmax = +5
-	noise_level = 0.1
-
 	train_data = dataset.DataSet(xmin, xmax, num_data=20, noise_level=noise_level)
 	no_noise_data = dataset.DataSet(xmin, xmax, num_data=1000, noise_level=0.0)
-	#train_data.plot()
+	train_data.plot()
 
 	model = RadialBasisFunctionRegression(num_basis=10)
 	model.train(train_data)
