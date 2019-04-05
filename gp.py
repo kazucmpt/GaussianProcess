@@ -49,7 +49,6 @@ class GaussianProcess:
 			for m2 in range(M):
 				partial_kernel_test_test[m1, m2] = self.rbf(self.xtest[m1], self.xtest[m2]) + chr(m1, m2)*self.theta3
 		
-		
 		self.mean_arr = partial_kernel_train_test.T @ self.kernel_inv @ self.ytrain
 		self.var_arr  = partial_kernel_test_test - partial_kernel_train_test.T @ self.kernel_inv @ partial_kernel_train_test
 
