@@ -80,7 +80,7 @@ def draw(train_data, test_data, no_noise_data, mean_arr, var_arr):
 	plt.tick_params(labelsize=16)
 	plt.title("Predicted line by Gaussian Process", fontsize="16")
 	plt.fill_between(xtest, boundary_upper, boundary_lower, facecolor='y',alpha=0.3)
-	plt.legend(["Train Data", "Predicted Line by limted test data", "GT without noise", "confidence interval $\pm\sigma$"],fontsize=16)
+	plt.legend(["Predicted Line by limted test data", "GT without noise", "Train Data with noise", "confidence interval $\pm\sigma$"],fontsize=16)
 	plt.savefig("gp.png")
 	plt.show()
 
